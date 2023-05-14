@@ -37,6 +37,7 @@
 // Globals
 int sockfd = -1;
 int port = 0;
+int q = 0;
 int gap = 0;
 int test_performance = 0;
 int flage = 0;
@@ -157,7 +158,7 @@ void call_server()
             perror("listen");
             return;
         }
-        printf("Server started, listening on port %d...\n", port);
+        if(!q) {printf("Server started, listening on port %d...\n", port);}
         // Accept client connection
         struct sockaddr_in client_addr = {0};
         socklen_t client_addrlen = sizeof(client_addr);
@@ -167,8 +168,8 @@ void call_server()
             perror("accept");
             return;
         }
-        printf("Client connected from %s:%d\n", inet_ntoa(client_addr.sin_addr), 		
-        ntohs(client_addr.sin_port));
+        if(!q) {printf("Client connected from %s:%d\n", inet_ntoa(client_addr.sin_addr), 		
+        ntohs(client_addr.sin_port));}
         sockfd = client_sockfd;
 
         if (test_performance)
@@ -211,7 +212,7 @@ void call_client()
         perror("connect");
         return;
     }
-    printf("Connected to server at %s:%d\n", ip, port);
+    if(!q) {printf("Connected to server at %s:%d\n", ip, port);}
 
     // Create the file with the data
     client_generate_to_file();
@@ -610,7 +611,7 @@ void explor_command(int argc, char* argv[])
 		dgram = 1;
 		
 	    }
-	    if ((strcmp(argv[i], "stream") == 0)) 
+	if ((strcmp(argv[i], "stream") == 0)) 
 	    {
 		stream = 1;
 		
@@ -656,7 +657,11 @@ void explor_command(int argc, char* argv[])
         if (strcmp(argv[i], "-p") == 0)
         {
             test_performance = 1;
-        }  
+        }
+        if (strcmp(argv[i], "-q") == 0)
+        {
+            q = 1;
+        }    
     }
 }
 
@@ -728,7 +733,7 @@ void uds_client(int is_stream)
     fclose(input);
     close(sfd);
 
-    printf("File sent successfully.\n");
+    if(!q) {printf("File sent successfully.\n");}
 }
 
 void server_receive_file(int cfd, int socket_type, const char *output_file) 
@@ -831,7 +836,7 @@ void uds_server(int is_srtream)
     }
 
     server_receive_file(cfd, socket_type, "FileToRecv.txt"); 
-    printf("File received\n");
+    
     close(cfd);
     close(sfd);
 
@@ -1031,7 +1036,7 @@ void mmap_receive()
 int main(int argc, char* argv[])
 {    
 
-    if (argc != 7) 
+    if (argc != 8) 
     {
         fprintf(stderr, "Communication protocol not specified.\n");
         print_usage();
@@ -1039,11 +1044,11 @@ int main(int argc, char* argv[])
     }
 
     explor_command(argc, argv);
-    if (is_server)
+    if (is_server && !q)
     {
         printf("Launching to server \n");
     }
-    else
+    else if (is_client && !q)
         printf("Launching to client \n");
     
     
@@ -1075,65 +1080,65 @@ int main(int argc, char* argv[])
     if (flage == TCP4)
     {
         if (is_server){recv_data();
-        printf("Received File:\nipv4_tcp,%f \n" , time1);
+        printf("ipv4_tcp,%f \n" , time1);
         return 0;
         }
-        if (is_client){send_data();printf("Send File\n");}
+        if (is_client){send_data();if(!q) {printf("Send File\n");}}
         
     }
     if (flage == UDP4)
     {
         if (is_server){udp_ipv4_server(); recv_data();
-        printf("Received File:\nipv4_udp,%f \n" , (time1 - (0.01 * gap)));
+        printf("ipv4_udp,%f \n" , (time1 - (0.01 * gap)));
         return 0;
         }
-        if (is_client){udp_ipv4_client(); send_data();printf("Send File\n");}
+        if (is_client){udp_ipv4_client(); send_data();if(!q) {printf("Send File\n");}}
         
         
     }
     if (flage == TCP6 || flage == UDP6)
     {
         if (is_server){ipv6_server(); recv_data();
-        if(flage == TCP6) {printf("Received message:\nipv6_tcp,%f \n" , (time1));}
-        else {printf("Received File:\nipv6_udp,%f \n" , (time1 - (0.01 * gap)));}
+        if(flage == TCP6) {printf("ipv6_tcp,%f \n" , (time1));}
+        else {printf("ipv6_udp,%f \n" , (time1 - (0.01 * gap)));}
         return 0;
         }
-        if (is_client){ipv6_client(); send_data();printf("Send File\n");}
+        if (is_client){ipv6_client(); send_data();if(!q){ printf("Send File\n");}}
         
     }
     if(flage == UDGRM)
     {
         if (is_server){uds_server(0);
-        printf("Received File:\ndgram_uds,%f \n" , (time2));
+        printf("dgram_uds,%f \n" , (time2));
         return 0;
         }
-        if (is_client){uds_client(0);printf("Send File\n");}
+        if (is_client){uds_client(0);if(!q) {printf("Send File\n");}}
         
     }
     if(flage == UDSTRM)
     {
         if (is_server){uds_server(1);
-        printf("Received File:\nstream_uds,%f \n" , (time2));
+        printf("stream_uds,%f \n" , (time2));
         }
-        if (is_client){uds_client(1);printf("Send File\n");}
+        if (is_client){uds_client(1);if(!q) {printf("Send File\n");}}
         
         
     }
     if(flage == PIPE)
     {
         if (is_server){pipe_receive();
-        printf("Received File:\npipe,%f \n" , (time3));
+        printf("pipe,%f \n" , (time3));
         }
-        if (is_client){pipe_send();printf("Send File\n");}
+        if (is_client){pipe_send();if(!q) {printf("Send File\n");}}
         
         
     }
     if(flage == MMAP)
     {
         if (is_server){mmap_receive();
-        printf("Received File:\nmmap,%f \n" , (time4));
+        printf("mmap,%f \n" , (time4));
         }
-        if (is_client){mmap_send(); printf("Send File\n");}
+        if (is_client){mmap_send(); if(!q) {printf("Send File\n");}}
         
         
     }
