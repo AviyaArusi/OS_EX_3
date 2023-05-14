@@ -1,0 +1,47 @@
+File Transfer using Socket Communication
+This code implements a file transfer mechanism using socket communication. It allows you to transfer a file between a client and a server using various communication protocols,
+such as TCP and UDP, and different addressing schemes, such as IPv4 and IPv6. Additionally, it supports file transfer using Unix Domain Sockets (UDS),
+as well as inter-process communication using pipes and shared memory (mmap).
+
+Note: the code run on Linux UBUNTU 22.04
+Usage
+To use the code, follow these steps:
+
+Compile the code using a C compiler. For example:
+
+gcc -o file_transfer file_transfer.c -lcrypto
+Run the compiled binary with appropriate command-line arguments. The available options are:
+
+For server:
+./stnc -s <PORT> -p -q 0 0 
+
+For client:
+./stnc -c <IP> <PORT> -p <PROTOCOL>
+
+Replace <PORT> with the port number to listen/connect to, <PROTOCOL> with the desired protocol (e.g., tcp, udp, dgram, stream), and <IP> with the IP address of the server.
+
+Note: for any run of the program you neet the terminal input to be in langth of 8 so is you need feil the meesing input in zero, for example:
+       ./stnc -s <PORT> -p -q 0 0 0  
+       ./stnc -c <IP> <PORT>  -p -q pipe 0
+  
+The code will perform the file transfer operation based on the specified protocol and addressing scheme. The transferred file will be saved as FileToRecv.txt on the server side and sent as FileToSend.txt from the client side.
+
+Supported Communication Protocols and Addressing Schemes
+The code supports the following communication protocols and addressing schemes:
+
+IPv4 TCP: Transfer a file using IPv4 and TCP/IP.
+IPv4 UDP: Transfer a file using IPv4 and UDP/IP.
+IPv6 TCP: Transfer a file using IPv6 and TCP/IP.
+IPv6 UDP: Transfer a file using IPv6 and UDP/IP.
+UDS Stream: Transfer a file using Unix Domain Sockets with stream-oriented communication.
+UDS Datagram: Transfer a file using Unix Domain Sockets with datagram-oriented communication.
+Pipe: Transfer a file using inter-process communication with pipes.
+Shared Memory (mmap): Transfer a file using shared memory.
+
+  Performance Testing
+The code also provides an option for performance testing. By using the -p flag, you can measure the time taken for file transfer and compare it with different protocols and addressing schemes.
+
+Note: The code requires the OpenSSL library for MD5 hashing. Please make sure the library is installed on your system.
+
+Contributions
+Contributions to this project are welcome. If you find any issues or have suggestions for improvement, please feel free to create a pull request or submit an issue.
